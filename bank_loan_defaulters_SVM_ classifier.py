@@ -1,3 +1,4 @@
+#import libraries
 import pandas as pd
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier, VotingClassifier
 from imblearn.over_sampling import RandomOverSampler, SMOTE
@@ -8,6 +9,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler, RobustScaler, LabelBinarizer
 from sklearn.svm import SVC
 
+# Loading data from CSV (data_loan is uploaded from Kaggle data base)
 def load_data():
     df = pd.read_csv('data_loan.csv')
     # Importing the dataset
@@ -18,6 +20,7 @@ def load_data():
     print(y)
     return X, y
 
+# Split and transform data in 80-20 ratio
 def split_transform(X, y):
     #Splitting the dataset into the Training set and Test set
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.20, random_state = 0)
@@ -28,6 +31,7 @@ def split_transform(X, y):
     print(len(X_train), len(X_test), len(y_train), y_test)
     return X_train, X_test, y_train, y_test
 
+#Plotting data to chekc imbalancing of dependent variable
 def data_plot(y_train):
     pos = y_train[y_train.values == 0].shape[0]
     neg = y_train[y_train.values == 1].shape[0]
@@ -42,6 +46,7 @@ def data_plot(y_train):
     plt.title("Class counts", y=1, fontdict={"fontsize": 20})
     plt.show()
 
+# Resampling data to balance imbalancing using SMOTE technique
 def data_resample(X_train, y_train):
     # Resampling using Smote
     sm = SMOTE(sampling_strategy=1, random_state=87)
@@ -49,21 +54,24 @@ def data_resample(X_train, y_train):
     data_plot(y_train)
     return X_train, y_train
 
+#Building data model using SVM classification
 def data_modeling(X_train, y_train, X_test):
+    # SVM classification
     classifier = SVC(kernel = 'rbf', random_state=87)
-
-    boosting = AdaBoostClassifier(base_estimator=classifier, n_estimators=10, algorithm='SAMME')
+   
+    '''boosting = AdaBoostClassifier(base_estimator=classifier, n_estimators=10, algorithm='SAMME')
     smote_rfc = RandomForestClassifier(n_estimators= 100,
-                                    criterion="entropy", random_state=47)
+                                       criterion="entropy", random_state=47)
 
-    '''ensemble = VotingClassifier(estimators=[('lr', boosting),('RandomForest', smote_rfc)],
+    ensemble = VotingClassifier(estimators=[('lr', boosting),('RandomForest', smote_rfc)],
                            voting='soft', weights=[1,1]).fit(X_train,y_train)'''
-
+    #Training Model
     classifier.fit(X_train, y_train)
     # Predicting the Test set results
     y_pred = classifier.predict(X_test)
     return y_pred
 
+# Evaluating model on ROC AUC curve
 def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
     lb = LabelBinarizer()
     lb.fit(y_test)
@@ -82,6 +90,7 @@ def multiclass_roc_auc_score(y_test, y_pred, average="macro"):
 
     return roc_auc_score(y_test, y_pred, average=average)
 
+# Evaluation Model
 def data_evaluation(y_test, y_pred):
     # Making the Confusion Matrix
     from sklearn.metrics import confusion_matrix
