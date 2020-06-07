@@ -11,7 +11,7 @@ from sklearn.svm import SVC
 
 # Loading data from CSV (data_loan is uploaded from Kaggle data base)
 def load_data():
-    df = pd.read_csv('data_loan.csv')
+    df = pd.read_csv('data_loan_bank_loan_deafaulters.csv')
     # Importing the dataset
     df = df.fillna(0.)
     X = df.iloc[:, 1: ]
